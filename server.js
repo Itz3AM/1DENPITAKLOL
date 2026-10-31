@@ -8,7 +8,7 @@ const PORT = process.env.PORT || 3000; // Render требует process.env.PORT
 // Загружаем ваш файл main.lua
 let scriptContent = '';
 try {
-    scriptContent = fs.readFileSync(path.join(__dirname, 'main.lua'), 'utf8');
+    scriptContent = fs.readFileSync(path.join(__dirname, 'main.lua2'), 'utf8');
     console.log("✅ Файл main.lua успешно загружен!");
 } catch (err) {
     console.error("❌ ОШИБКА: Не удалось найти main.lua", err);
