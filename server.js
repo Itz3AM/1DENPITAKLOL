@@ -18,29 +18,24 @@ try {
 app.get('/script', (req, res) => {
     const userAgent = req.headers['user-agent'] || '';
     
-    // Логируем запрос, чтобы ты видел, кто стучится
+    // Логируем запрос
     console.log(`[ЗАПРОС] UA: ${userAgent}`);
 
-    // СТРОГАЯ ПРОВЕРКА: User-Agent должен быть ровно "Roblox/WinInet"
+    // СТРОГАЯ ПРОВЕРКА
     if (userAgent === 'Roblox/WinInet') {
         console.log("✅ Доступ разрешен (Roblox/WinInet). Скрипт выдан.");
         res.setHeader('Content-Type', 'text/plain; charset=utf-8');
         return res.send(scriptContent);
     }
 
-    // Если это кто-то другой (браузер, бот, WinInet2) — БАН И РЕДИРЕКТ
-    console.log(`❌ БАН: Неизвестный User-Agent (${userAgent}). Кидаем на idinaxui.com`);
-    
-    // Ставим куки (чтобы запомнить Васяна, если он зайдет снова)
-    res.cookie('banned_user', 'true', { maxAge: 31536000000, httpOnly: true });
-    
-    // Перенаправляем
+    // БАН И РЕДИРЕКТ (без куки)
+    console.log(`❌ БАН: Неизвестный UA (${userAgent}). РЕДИРЕКТ.`);
     res.redirect('https://idinaxui.com');
 });
 
-// Если кто-то зашел просто на главную страницу — тоже кидаем на сайт
+// Главная страница
 app.get('/', (req, res) => {
-    res.cookie('banned_user', 'true', { maxAge: 31536000000, httpOnly: true });
+    console.log("❌ Кто-то зашел на главную. РЕДИРЕКТ.");
     res.redirect('https://idinaxui.com');
 });
 
