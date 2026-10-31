@@ -17494,7 +17494,6 @@ do
                                                         RagdollInRG = false,
                                                         DeleteShurInNK = true,
                                                         EKI = false,
-                                                        EKIFrame = false,
                                                         AutoHouse = false,
                                                         Invisibility = false,
                                                         GradientLine = false,
@@ -17619,7 +17618,7 @@ do
                                                         LagLines = 11,
                                                         BlackHoles = 0,
                                                         Packets = 0.35,
-                                                        PacketPrefix = "RSC | ",
+                                                        PacketPrefix = "80085",
                                                         PacketDelay = 0.1,
                                                         LoboStrength = 166.6,
                                                         AutoServerHopTime = 30,
@@ -24808,7 +24807,7 @@ end
                                         -- Delete Map <-> Boost FPS sync:
                                         -- toggle OFF -> always restore the map, toggle ON -> apply only if selected in dropdown
                                         if tbl12.SetDeleteMap then
-                                        	tbl12.SetDeleteMap(arg == true and deleteMapSelected or false)
+                                                tbl12.SetDeleteMap(arg == true and deleteMapSelected or false)
                                         end
                                         flag12 = arg and not flag11
                                         local v23 = flag14
@@ -24859,11 +24858,11 @@ end
                                                                 for k, v24 in tbl16, nil, nil do
                                                                         if k.Parent then
                                                                                 for k2, v25 in v24, nil, nil do
-                                                                                	if k[k2] == v25[2] then
-                                                                                		pcall(function()
-                                                                                			k[k2] = v25[1]
-                                                                                		end)
-                                                                                	end
+                                                                                        if k[k2] == v25[2] then
+                                                                                                pcall(function()
+                                                                                                        k[k2] = v25[1]
+                                                                                                end)
+                                                                                        end
                                                                                 end
                                                                         end
 
@@ -24898,9 +24897,9 @@ end
                                         -- Delete Map is a sub-option of Boost FPS:
                                         -- remember the selection, but only apply it while Boost FPS is enabled
                                         if tbl12.SetDeleteMap then
-                                        	local hasDeleteMap = typeof(arg) == "table" and arg["Delete Map"] == true
-                                        	deleteMapSelected = hasDeleteMap
-                                        	tbl12.SetDeleteMap(flag12 and hasDeleteMap or false)
+                                                local hasDeleteMap = typeof(arg) == "table" and arg["Delete Map"] == true
+                                                deleteMapSelected = hasDeleteMap
+                                                tbl12.SetDeleteMap(flag12 and hasDeleteMap or false)
                                         end
                                 end
 
@@ -24915,78 +24914,78 @@ end
                                 -- All children of workspace.Map (we delete them, NOT the Map itself)
                                 -- Skip AlwaysHereTweenedObjects and MapNoises (do not touch)
                                 local DELETE_MAP_NAMES = {
-                                	"MapProps",
-                                	"BarnHillArea", "BaseGround", "CaveMountain", "FactoryIsland",
-                                	"Hole", "Mountain2Cave", "MountainSnowTop", "TrainTunnel",
+                                        "MapProps",
+                                        "BarnHillArea", "BaseGround", "CaveMountain", "FactoryIsland",
+                                        "Hole", "Mountain2Cave", "MountainSnowTop", "TrainTunnel",
                                 }
 
                                 tbl12.SetDeleteMap = function(arg)
                                         if arg == deleteMapActive then
-                                        	return
+                                                return
                                         end
                                         deleteMapActive = arg
 
                                         -- Cancel any running delete/restore thread
                                         if deleteMapThread then
-                                        	pcall(task.cancel, deleteMapThread)
-                                        	deleteMapThread = nil
+                                                pcall(task.cancel, deleteMapThread)
+                                                deleteMapThread = nil
                                         end
 
                                         if arg then
-                                        	-- Activate: create platform + remove models one by one
-                                        	deleteMapThread = task.spawn(function()
-                                        		-- Create the floor platform first (1000x1000 at Y=-7)
-                                        		if not deleteMapPlatform or not deleteMapPlatform.Parent then
-                                        			deleteMapPlatform = Instance.new("Part")
-                                        			deleteMapPlatform.Name = "PitakDeleteMapPlatform"
-                                        			deleteMapPlatform.Size = Vector3.new(1000, 1, 1000)
-                                        			deleteMapPlatform.Position = Vector3.new(0, -10.5, 0)
-                                        			deleteMapPlatform.Anchored = true
-                                        			deleteMapPlatform.CanCollide = true
-                                        			deleteMapPlatform.Material = Enum.Material.Plastic
-                                        			deleteMapPlatform.Color = Color3.fromRGB(80, 80, 80)
-                                        			deleteMapPlatform.TopSurface = Enum.SurfaceType.Smooth
-                                        			deleteMapPlatform.BottomSurface = Enum.SurfaceType.Smooth
-                                        			deleteMapPlatform.Parent = workspace
-                                        		end
+                                                -- Activate: create platform + remove models one by one
+                                                deleteMapThread = task.spawn(function()
+                                                        -- Create the floor platform first (1000x1000 at Y=-7)
+                                                        if not deleteMapPlatform or not deleteMapPlatform.Parent then
+                                                                deleteMapPlatform = Instance.new("Part")
+                                                                deleteMapPlatform.Name = "PitakDeleteMapPlatform"
+                                                                deleteMapPlatform.Size = Vector3.new(1000, 1, 1000)
+                                                                deleteMapPlatform.Position = Vector3.new(0, -10.5, 0)
+                                                                deleteMapPlatform.Anchored = true
+                                                                deleteMapPlatform.CanCollide = true
+                                                                deleteMapPlatform.Material = Enum.Material.Plastic
+                                                                deleteMapPlatform.Color = Color3.fromRGB(80, 80, 80)
+                                                                deleteMapPlatform.TopSurface = Enum.SurfaceType.Smooth
+                                                                deleteMapPlatform.BottomSurface = Enum.SurfaceType.Smooth
+                                                                deleteMapPlatform.Parent = workspace
+                                                        end
 
-                                        		-- Remove map models one by one (small delay between each)
-                                        		for _, name in ipairs(DELETE_MAP_NAMES) do
-                                        			if not deleteMapActive then
-                                        				break
-                                        			end
-                                        			local mapFolder = workspace:FindFirstChild("Map")
-								local model = mapFolder and mapFolder:FindFirstChild(name)
-                                        			if model and not deleteMapCache[model] then
-                                        				-- Cache the original parent so we can restore later
-                                        				deleteMapCache[model] = model.Parent
-                                        				pcall(function()
-                                        					model.Parent = nil
-                                        				end)
-                                        			end
-                                        			task.wait(0.1)
-                                        		end
-                                        	end)
+                                                        -- Remove map models one by one (small delay between each)
+                                                        for _, name in ipairs(DELETE_MAP_NAMES) do
+                                                                if not deleteMapActive then
+                                                                        break
+                                                                end
+                                                                local mapFolder = workspace:FindFirstChild("Map")
+                                                                local model = mapFolder and mapFolder:FindFirstChild(name)
+                                                                if model and not deleteMapCache[model] then
+                                                                        -- Cache the original parent so we can restore later
+                                                                        deleteMapCache[model] = model.Parent
+                                                                        pcall(function()
+                                                                                model.Parent = nil
+                                                                        end)
+                                                                end
+                                                                task.wait(0.1)
+                                                        end
+                                                end)
                                         else
-                                        	-- Deactivate: restore models one by one, remove platform
-                                        	deleteMapThread = task.spawn(function()
-                                        		for model, originalParent in pairs(deleteMapCache) do
-                                        			if model and originalParent and originalParent.Parent then
-                                        				pcall(function()
-                                        					model.Parent = originalParent
-                                        				end)
-                                        			end
-                                        			task.wait(0.1)
-                                        		end
-                                        		table.clear(deleteMapCache)
+                                                -- Deactivate: restore models one by one, remove platform
+                                                deleteMapThread = task.spawn(function()
+                                                        for model, originalParent in pairs(deleteMapCache) do
+                                                                if model and originalParent and originalParent.Parent then
+                                                                        pcall(function()
+                                                                                model.Parent = originalParent
+                                                                        end)
+                                                                end
+                                                                task.wait(0.1)
+                                                        end
+                                                        table.clear(deleteMapCache)
 
-                                        		if deleteMapPlatform and deleteMapPlatform.Parent then
-                                        			pcall(function()
-                                        					deleteMapPlatform:Destroy()
-                                        				end)
-                                        		end
-                                        		deleteMapPlatform = nil
-                                        	end)
+                                                        if deleteMapPlatform and deleteMapPlatform.Parent then
+                                                                pcall(function()
+                                                                                deleteMapPlatform:Destroy()
+                                                                        end)
+                                                        end
+                                                        deleteMapPlatform = nil
+                                                end)
                                         end
                                 end
                         end
@@ -35188,19 +35187,18 @@ Escape Timer: %*]]
                 task.spawn(function()
                         local tbl16 = {}
 
-				-- Cached constants for limb neutralization (defined ONCE, not every frame)
-				local LIMB_NAMES = { "Left Leg", "Right Leg", "Left Arm", "Right Arm", "Head", "Torso" }
-				local ZERO_VECTOR = Vector3.new()
-				-- Cache of limb parts per character (avoid FindFirstChild every frame)
-				local limbCache = {}
-				local ekiEverUsed = false -- true once any EKI pin has been applied
-				local pinClock, rearmUntil = {}, {} -- per-root pin state (auto re-arm)
-				local ekiAutoName -- which EKI toggle the auto cycle turned off (restored when a kick starts)
-				local ekiPullAt = {} -- per-player tick() of the last not-in-kick (pull/lost) frame
-				local EKI_ON_DELAY = 0.16 -- delay before the auto toggle turns back on after a pull
+                                -- Cached constants for limb neutralization (defined ONCE, not every frame)
+                                local LIMB_NAMES = { "Left Leg", "Right Leg", "Left Arm", "Right Arm", "Head", "Torso" }
+                                local ZERO_VECTOR = Vector3.new()
+                                -- Cache of limb parts per character (avoid FindFirstChild every frame)
+                                local limbCache = {}
+                                local ekiEverUsed = false -- true once any EKI pin has been applied
+                                local ekiAutoName -- which EKI toggle the auto cycle turned off (restored when a kick starts)
+                                local ekiPullAt = {} -- per-player tick() of the last not-in-kick (pull/lost) frame
+                                local EKI_ON_DELAY = 0.16 -- delay before the auto toggle turns back on after a pull
 
                                                 local function fn21(arg, arg2)
-                                if not arg or (arg2 and not (tbl8.EKI or tbl8.EKIFrame)) then
+                                if not arg or (arg2 and not tbl8.EKI) then
                                         return
                                 end
 
@@ -35243,12 +35241,10 @@ Escape Timer: %*]]
                                                 weldHRP.Enabled = true
                                         end
 
-                                        -- always clear any leftover pin on cleanup (both EKI modes)
+                                        -- always clear any leftover pin on cleanup
                                         if ekiEverUsed then
                                                 fn21(v23, nil)
                                         end
-                                        pinClock[v23] = nil
-                                        rearmUntil[v23] = nil
                                         ekiPullAt[arg] = nil -- auto-toggle per-player state
                                 end
 
@@ -35273,17 +35269,17 @@ Escape Timer: %*]]
                                 if not arg or not arg:IsA("BasePart") or not arg.Parent then
                                         return false
                                 end
-                        
+
                                 local params = RaycastParams.new()
                                 params.FilterType = Enum.RaycastFilterType.Exclude
                                 params.FilterDescendantsInstances = { arg.Parent }
                                 params.IgnoreWater = true
-                        
+
                                 -- solid ground below -> grounded
                                 if workspace:Raycast(arg.Position, Vector3.new(0, -8, 0), params) then
                                         return false
                                 end
-                        
+
                                 -- anti-burial: overlapping a solid part (the floor we are inside of) -> grounded
                                 local ok, touching = pcall(function()
                                         local overlap = OverlapParams.new()
@@ -35291,7 +35287,7 @@ Escape Timer: %*]]
                                         overlap.FilterDescendantsInstances = { arg.Parent }
                                         return workspace:GetPartsInPart(arg, overlap)
                                 end)
-                        
+
                                 if ok and touching then
                                         for _, part in ipairs(touching) do
                                                 if part:IsA("BasePart") and part.CanCollide then
@@ -35299,9 +35295,10 @@ Escape Timer: %*]]
                                                 end
                                         end
                                 end
-                        
+
                                 return true
                         end
+
 
                         while task.wait() do
                                 if flag11 then
@@ -35433,39 +35430,35 @@ Escape Timer: %*]]
                                                                                                 -- Get or build limb cache for this character (built ONCE, reused after)
                                                                                                 local cached = limbCache[v26]
                                                                                                 if not cached then
-                                                                                                	cached = {}
-                                                                                                	for _, limbName in ipairs(LIMB_NAMES) do
-                                                                                                		local part = v26:FindFirstChild(limbName)
-                                                                                                		if part then table.insert(cached, part) end
-                                                                                                	end
-                                                                                                	limbCache[v26] = cached
+                                                                                                        cached = {}
+                                                                                                        for _, limbName in ipairs(LIMB_NAMES) do
+                                                                                                                local part = v26:FindFirstChild(limbName)
+                                                                                                                if part then table.insert(cached, part) end
+                                                                                                        end
+                                                                                                        limbCache[v26] = cached
                                                                                                 end
 
                                                                                                 -- Zero velocity/rotation/collision only when changed (no pcall - cheap ops)
                                                                                                 for _, part in ipairs(cached) do
-                                                                                                	if part.Parent then
-                                                                                                		if part.Velocity ~= ZERO_VECTOR then part.Velocity = ZERO_VECTOR end
-                                                                                                		if part.RotVelocity ~= ZERO_VECTOR then part.RotVelocity = ZERO_VECTOR end
-                                                                                                		if part.CanCollide ~= false then part.CanCollide = false end
-                                                                                                	end
+                                                                                                        if part.Parent then
+                                                                                                                if part.Velocity ~= ZERO_VECTOR then part.Velocity = ZERO_VECTOR end
+                                                                                                                if part.RotVelocity ~= ZERO_VECTOR then part.RotVelocity = ZERO_VECTOR end
+                                                                                                                if part.CanCollide ~= false then part.CanCollide = false end
+                                                                                                        end
                                                                                                 end
 
                                                                                                 -- Force humanoid state: only set when value changed (pcall only when needed)
                                                                                                 if v28 then
-                                                                                                	if v28.PlatformStand ~= true then pcall(function() v28.PlatformStand = true end) end
-                                                                                                	if v28.AutoRotate ~= false then pcall(function() v28.AutoRotate = false end) end
-                                                                                                	if v28.Jump ~= false then pcall(function() v28.Jump = false end) end
-                                                                                                	if v28.UseJumpPower ~= false then pcall(function() v28.UseJumpPower = false end) end
-                                                                                                	if v28.EvaluateStateMachine ~= false then pcall(function() v28.EvaluateStateMachine = false end) end
+                                                                                                        if v28.PlatformStand ~= true then pcall(function() v28.PlatformStand = true end) end
+                                                                                                        if v28.AutoRotate ~= false then pcall(function() v28.AutoRotate = false end) end
+                                                                                                        if v28.Jump ~= false then pcall(function() v28.Jump = false end) end
+                                                                                                        if v28.UseJumpPower ~= false then pcall(function() v28.UseJumpPower = false end) end
+                                                                                                        if v28.EvaluateStateMachine ~= false then pcall(function() v28.EvaluateStateMachine = false end) end
                                                                                                 end
                                                                                         end
 
                                                                                         -- auto toggle: the target is in the kick (close) right now -> vote ON.
-                                                                                        -- No airborne check here on purpose: fnAirborne can false-negative while
-                                                                                        -- the target is grabbed near us / near the floor, which used to leave the
-                                                                                        -- toggle stuck OFF during an active kick. The pin itself is still gated
-                                                                                        -- per-frame by fnAirborne inside the EKI logic below.
-                                                                                        if tbl8.EKI or tbl8.EKIFrame or ekiAutoName then
+                                                                                        if tbl8.EKI or ekiAutoName then
                                                                                                 -- ON delay: gives the kick time to launch the target into the
                                                                                                 -- air after the pull before the toggle (and the pin) comes back
                                                                                                 local pulled = ekiPullAt[v25]
@@ -35473,36 +35466,8 @@ Escape Timer: %*]]
                                                                                                         ekiWantOn = true
                                                                                                 end
                                                                                         end
-                                                                                        if tbl8.EKIFrame then
-                                                                                                -- every frame: pin in the air, unpin on the ground.
-                                                                                                -- Auto re-arm (the manual "toggle EKI off -> on" trick): after the pin
-                                                                                                -- has been held for a while it is dropped for a moment, so a bad pin
-                                                                                                -- can never glue the target forever.
-                                                                                                local now = tick()
-                                                                                                local held = pinClock[v27]
-                                                                                                if held and now - held >= 1.5 then
-                                                                                                                fn21(v27, nil)
-                                                                                                                if not rearmUntil[v27] then
-                                                                                                                                rearmUntil[v27] = now + 0.25
-                                                                                                                end
-                                                                                                        end
-                                                                                                        if rearmUntil[v27] then
-                                                                                                                        fn21(v27, nil)
-                                                                                                                        if now >= rearmUntil[v27] then
-                                                                                                                                        rearmUntil[v27] = nil
-                                                                                                                                        pinClock[v27] = nil
-                                                                                                                        end
-                                                                                                        elseif fnAirborne(v27) then
-                                                                                                                        fn21(v27, v27)
-                                                                                                                        if not pinClock[v27] then
-                                                                                                                                        pinClock[v27] = now
-                                                                                                                        end
-                                                                                                        else
-                                                                                                                        fn21(v27, nil)
-                                                                                                                        pinClock[v27] = nil
-                                                                                                        end
-                                                                                        elseif tbl8.EKI then
-                                                                                                -- original: apply once after 0.6 seconds, but only while the target is airborne
+                                                                                        if tbl8.EKI then
+                                                                                                -- apply once after 0.6 seconds, but only while the target is airborne
                                                                                                 task.delay(0.6, function()
                                                                                                         for _ = 1, 20 do
                                                                                                                 if not (tbl8.LoopApplyMethodT and tbl7.TargetMethods.Kick and tbl7.SelectedPlayers[v25]) then
@@ -35520,11 +35485,6 @@ Escape Timer: %*]]
                                                                                                                 task.wait(0.1)
                                                                                                         end
                                                                                                 end)
-                                                                                        else
-                                                                                                -- both EKI toggles are off: clear any leftover pin
-                                                                                                if ekiEverUsed then
-                                                                                                        fn21(v27, nil)
-                                                                                                end
                                                                                         end
                                                                                 elseif tbl12.SNO(v27) then
                                                                                         tbl12.Teleport(v27, v29)
@@ -35559,56 +35519,52 @@ Escape Timer: %*]]
                                                                                                 -- Get or build limb cache for this character (built ONCE, reused after)
                                                                                                 local cached = limbCache[v26]
                                                                                                 if not cached then
-                                                                                                	cached = {}
-                                                                                                	for _, limbName in ipairs(LIMB_NAMES) do
-                                                                                                		local part = v26:FindFirstChild(limbName)
-                                                                                                		if part then table.insert(cached, part) end
-                                                                                                	end
-                                                                                                	limbCache[v26] = cached
+                                                                                                        cached = {}
+                                                                                                        for _, limbName in ipairs(LIMB_NAMES) do
+                                                                                                                local part = v26:FindFirstChild(limbName)
+                                                                                                                if part then table.insert(cached, part) end
+                                                                                                        end
+                                                                                                        limbCache[v26] = cached
                                                                                                 end
 
                                                                                                 -- Zero velocity/rotation/collision only when changed (no pcall - cheap ops)
                                                                                                 for _, part in ipairs(cached) do
-                                                                                                	if part.Parent then
-                                                                                                		if part.Velocity ~= ZERO_VECTOR then part.Velocity = ZERO_VECTOR end
-                                                                                                		if part.RotVelocity ~= ZERO_VECTOR then part.RotVelocity = ZERO_VECTOR end
-                                                                                                		if part.CanCollide ~= false then part.CanCollide = false end
-                                                                                                	end
+                                                                                                        if part.Parent then
+                                                                                                                if part.Velocity ~= ZERO_VECTOR then part.Velocity = ZERO_VECTOR end
+                                                                                                                if part.RotVelocity ~= ZERO_VECTOR then part.RotVelocity = ZERO_VECTOR end
+                                                                                                                if part.CanCollide ~= false then part.CanCollide = false end
+                                                                                                        end
                                                                                                 end
 
                                                                                                 -- Force humanoid state: only set when value changed (pcall only when needed)
                                                                                                 if v28 then
-                                                                                                	if v28.PlatformStand ~= true then pcall(function() v28.PlatformStand = true end) end
-                                                                                                	if v28.AutoRotate ~= false then pcall(function() v28.AutoRotate = false end) end
-                                                                                                	if v28.Jump ~= false then pcall(function() v28.Jump = false end) end
-                                                                                                	if v28.UseJumpPower ~= false then pcall(function() v28.UseJumpPower = false end) end
-                                                                                                	if v28.EvaluateStateMachine ~= false then pcall(function() v28.EvaluateStateMachine = false end) end
+                                                                                                        if v28.PlatformStand ~= true then pcall(function() v28.PlatformStand = true end) end
+                                                                                                        if v28.AutoRotate ~= false then pcall(function() v28.AutoRotate = false end) end
+                                                                                                        if v28.Jump ~= false then pcall(function() v28.Jump = false end) end
+                                                                                                        if v28.UseJumpPower ~= false then pcall(function() v28.UseJumpPower = false end) end
+                                                                                                        if v28.EvaluateStateMachine ~= false then pcall(function() v28.EvaluateStateMachine = false end) end
                                                                                                 end
                                                                                         end
 
-                                                                                        -- pull phase (target far): the EKI spam is paused here (user method):
-                                                                                        -- the pin only applies on the kick itself (target close), while any
-                                                                                        -- stale pin is cleared so the target can be dragged freely
+                                                                                        -- pull phase (target far): clear any stale pin so the target can be dragged freely
                                                                                         if ekiEverUsed then
                                                                                                 fn21(v27, nil)
-                                                                                                pinClock[v27] = nil
-                                                                                                rearmUntil[v27] = nil
                                                                                         end
                                                                                         -- auto toggle: remember the last not-in-kick moment (drives the ON delay)
                                                                                         ekiPullAt[v25] = tick()
                                                                                         -- auto toggle: the pull is not the kick itself; vote OFF while grounded
-                                                                                        if (tbl8.EKI or tbl8.EKIFrame or ekiAutoName) and not fnAirborne(v27) then
+                                                                                        if (tbl8.EKI or ekiAutoName) and not fnAirborne(v27) then
                                                                                                 ekiWantOff = true
                                                                                         end
                                                                                 else
-                                                                                        -- lost the target: always clear the pin (Every Frame mode included)
+                                                                                        -- lost the target: always clear the pin
                                                                                         if ekiEverUsed then
                                                                                                 fn21(v27, nil)
                                                                                         end
                                                                                         -- auto toggle: remember the last not-in-kick moment (drives the ON delay)
                                                                                         ekiPullAt[v25] = tick()
                                                                                         -- auto toggle: the target is lost; vote OFF while it is grounded
-                                                                                        if (tbl8.EKI or tbl8.EKIFrame or ekiAutoName) and not fnAirborne(v27) then
+                                                                                        if (tbl8.EKI or ekiAutoName) and not fnAirborne(v27) then
                                                                                                 ekiWantOff = true
                                                                                         end
                                                                                 end
@@ -35620,13 +35576,10 @@ Escape Timer: %*]]
                                                         -- OFF while no target is being kicked and it stands on the ground,
                                                         -- ON again the moment an active kick has the target in the air.
                                                         if ekiWantOn then
-                                                                if tbl8.EKI or tbl8.EKIFrame then
-                                                                        ekiAutoName = nil -- something is already active, manual choice wins
+                                                                if tbl8.EKI then
+                                                                        ekiAutoName = nil -- already active, manual choice wins
                                                                 elseif ekiAutoName == "EKI" and toggles.EKIToggle then
                                                                         toggles.EKIToggle:SetValue(true)
-                                                                        ekiAutoName = nil
-                                                                elseif ekiAutoName == "EKIFrame" and toggles.EKIFrameToggle then
-                                                                        toggles.EKIFrameToggle:SetValue(true)
                                                                         ekiAutoName = nil
                                                                 end
                                                         elseif ekiWantOff then
@@ -35635,14 +35588,7 @@ Escape Timer: %*]]
                                                                         if toggles.EKIToggle then
                                                                                 toggles.EKIToggle:SetValue(false)
                                                                         end
-                                                                elseif tbl8.EKIFrame then
-                                                                        ekiAutoName = "EKIFrame"
-                                                                        if toggles.EKIFrameToggle then
-                                                                                toggles.EKIFrameToggle:SetValue(false)
-                                                                        end
                                                                 end
-                                                                -- both toggles are already off here: keep ekiAutoName untouched so the
-                                                                -- pending auto restore survives until the next kick turns the toggle back on
                                                         end
                                                         if tbl9.NKDelayMode == "Normal" then
                                                                 task.wait()
@@ -35761,13 +35707,14 @@ Escape Timer: %*]]
                 tbl15 = {
                         Home = v19:AddTab("<b>Home</b>", "house", "Profile, statistics"),
                         Player = v19:AddTab("<b>Player</b>", "person-standing", "Things you can apply to yourself"),
-                        Combat = v19:AddTab("<b>Combat</b>", "hand", "Grab/Line/Auras stuff"),
+                        Combat = v19:AddTab("<b>Combat</b>", "swords", "Grab/Line/Auras stuff"),
                         Invincibility = v19:AddTab("<b>Invincibility</b>", "shield", "Defense"),
                         Target = v19:AddTab("<b>Target</b>", "crosshair", "Single/multiple target actions"),
-                        Blobman = v19:AddTab("<b>Blobman</b>", "venetian-mask", "Single/multiple Blobman target actions"),
+                        Blobman = v19:AddTab("<b>Blobman</b>", "user", "Single/multiple Blobman target actions"),
                         Toys = v19:AddTab("<b>Toys</b>", "shapes", "Actions you can do with Toys"),
                         Visual = v19:AddTab("<b>Visual</b>", "eye", "Stuff only you can see"),
-                        AutoClicker = v19:AddTab("<b>Auto-Clicker</b>", "mouse-pointer-click", "Make figures out of players"),
+                        Server = v19:AddTab("<b>Server</b>", "server", "Server lag tools"),
+                        Figure = v19:AddTab("<b>Figure Grab</b>", "hand", "Make figures out of players"),
                         Keybinds = v19:AddTab("<b>Keybinds</b>", "keyboard", "Keybinds you can press for specific action"),
                         Misc = v19:AddTab("<b>Misc</b>", "funnel", "Other things"),
                         Lists = v19:AddTab("<b>Lists</b>", "scroll-text", "Miscellaneous useful dropdowns"),
@@ -36576,7 +36523,7 @@ Escape Timer: %*]]
         end
 
         do
-                local v20 = tbl15.Combat:AddRightTabbox("Server Lag")
+                local v20 = tbl15.Server:AddLeftTabbox("Server Lag")
                 local Lines = v20:AddTab("Lines", "spline")
 
                 Lines:AddToggle("LineLagToggle", {
@@ -36721,6 +36668,7 @@ Escape Timer: %*]]
                 Packets:AddInput("CustomPacketPrefix", {
                         Text = "Custom Prefix",
                         Tooltip = "If exploiters have a packet detector, this prefix will show up for them if the detector shows the text",
+                        Default = "80085",
                         ClearTextOnFocus = false,
                         Callback = function(arg)
                                 tbl9.PacketPrefix = tostring(arg)
@@ -36785,7 +36733,6 @@ Escape Timer: %*]]
                 local ShurikenLagButton
                 ShurikenLagButton = ShurikenLag:AddButton({
                     Text = "Shuriken Lag",
-                    Tooltip = "Spawns 1 shuriken, takes network owner, sticks it to (Length x 4.6M) studs - 500 = 2.3B default - and deletes it after 1.5 seconds.",
                     Func = function()
                         local character, hrp, humanoid = tbl12.Char()
                         if not character or not hrp or not humanoid or humanoid.Health == 0 then
@@ -36926,7 +36873,7 @@ Escape Timer: %*]]
         end
 
         do
-                local Auras = tbl15.Combat:AddLeftGroupbox("Auras", "salad")
+                local Auras = tbl15.Combat:AddRightGroupbox("Auras", "salad")
 
                 Auras:AddDropdown("AurasDropdown", {
                         Values = {
@@ -37857,33 +37804,14 @@ Escape Timer: %*]]
                         Text = "Experimental Kick Improvements [BETA]",
                         Risky = true,
                         Default = tbl8.EKI,
-                        Tooltip = "Improves the kick, but can get very buggy! This also doesn't work on bad executors. AUTO: switches itself off while nothing is being kicked on the ground, and back on the whole time a target is being kicked",
+                        Tooltip = "Improves the kick, but can get very buggy! This also doesn't work on bad executors",
                         DisabledTooltip = "Your executor does not support this feature!",
                         Disabled = typeof(sethiddenproperty) ~= "function",
                         Callback = function(eki)
                                 tbl8.EKI = eki
-
-                                if eki and toggles.EKIFrameToggle then
-                                        toggles.EKIFrameToggle:SetValue(false)
-                                end
                         end,
                 })
 
-                v21:AddToggle("EKIFrameToggle", {
-                    Text = "EKI Every Frame [BETA]",
-                    Risky = true,
-                    Default = tbl8.EKIFrame,
-                    Tooltip = "BETA: pins only while the target is being kicked (close) and off the ground - paused during the pull, auto re-arms every 1.5 s so it can never glue forever.",
-                    DisabledTooltip = "Your executor does not support this feature!",
-                    Disabled = typeof(sethiddenproperty) ~= "function",
-                    Callback = function(ekiframe)
-                        tbl8.EKIFrame = ekiframe
-                
-                        if ekiframe and toggles.EKIToggle then
-                            toggles.EKIToggle:SetValue(false)
-                        end
-                    end,
-                })
 
                 v21:AddSlider("HeightNK", {
                         Text = "Kick Height",
@@ -41678,7 +41606,7 @@ Escape Timer: %*]]
         do
                 local selectedPlayersAC = tbl7.SelectedPlayersAC
 
-                tbl12.CreatePlayerDropdown(tbl15.AutoClicker:AddLeftGroupbox("Target", "user"), "AutoClicker", selectedPlayersAC, true, true, function()
+                tbl12.CreatePlayerDropdown(tbl15.Figure:AddLeftGroupbox("Target", "user"), "AutoClicker", selectedPlayersAC, true, true, function()
                         if tbl12.SyncACPoseTargets then
                                 tbl12.SyncACPoseTargets()
                         end
@@ -41686,7 +41614,7 @@ Escape Timer: %*]]
         end
 
         do
-                local Config = tbl15.AutoClicker:AddLeftGroupbox("Config", "settings")
+                local Config = tbl15.Figure:AddLeftGroupbox("Config", "settings")
 
                 Config:AddToggle("AutoClicker", {
                         Text = "Toggle",
@@ -41874,7 +41802,7 @@ Escape Timer: %*]]
         end
 
         do
-                local v20 = tbl15.AutoClicker:AddRightTabbox()
+                local v20 = tbl15.Figure:AddRightTabbox()
                 local Offset = v20:AddTab("Offset", "move-diagonal")
                 local Rotation = v20:AddTab("Rotation", "refresh-cw")
 
@@ -41984,7 +41912,7 @@ Escape Timer: %*]]
         end
 
         do
-                local Presets = tbl15.AutoClicker:AddRightGroupbox("Presets", "settings-2")
+                local Presets = tbl15.Figure:AddRightGroupbox("Presets", "settings-2")
                 local tbl16 = {}
 
                 for k in tbl7.AutoClickerPoses, nil, nil do
